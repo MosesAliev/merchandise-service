@@ -7,9 +7,12 @@ import (
 	"log"
 	"net/http"
 
+	"merchandise-service/domain"
 	"merchandise-service/models"
+	"merchandise-service/postgres"
+	"merchandise-service/repository"
 	"merchandise-service/restapi/operations"
-	"merchandise-service/usecase"
+	"merchandise-service/service"
 
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/runtime"
@@ -73,7 +76,10 @@ func configureAPI(api *operations.MerchAPI) http.Handler {
 		})
 	}
 	api.PostAPIAuthHandler = operations.PostAPIAuthHandlerFunc(func(params operations.PostAPIAuthParams) middleware.Responder {
-		token, err := usecase.Auth(*params.Body.Username, params.Body.Password.String())
+		user := domain.NewUser(*params.Body.Username, params.Body.Password.String())
+		repo := repository.NewPostgresUserRepository(postgres.DB)
+		authService := service.NewAuthService(repo)
+		token, err := authService.Auth(user)
 		if err != nil {
 			response := operations.NewPostAPIAuthBadRequest()
 			log.Println(err.Error())

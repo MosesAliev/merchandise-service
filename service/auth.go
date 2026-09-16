@@ -2,17 +2,16 @@ package service
 
 import (
 	"merchandise-service/domain"
-	"merchandise-service/repository"
 
 	"github.com/golang-jwt/jwt/v5"
 	_ "github.com/lib/pq"
 )
 
 type AuthService struct {
-	repo repository.UserRepository
+	repo UserRepository
 }
 
-func NewAuthService(repo repository.UserRepository) *AuthService {
+func NewAuthService(repo UserRepository) *AuthService {
 	return &AuthService{repo: repo}
 }
 
